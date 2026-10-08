@@ -1,0 +1,6 @@
+{
+  "name": "QazEduLedger - Блокчейн-реестр университетских платежей РК",
+  "description": "Единая децентрализованная база данных и блокчейн-реестр студенческих платежей, общежитий и университетских сборов Республики Казахстан с пакетной регистрацией.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
