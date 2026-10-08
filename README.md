@@ -1,69 +1,39 @@
 # UniChain.kz
 
-**Единый блокчейн-реестр университетских платежей Республики Казахстан** с интеграцией Solana Devnet и кошелька Phantom.
+> Decentralized student tuition, dorm fee, and university payment ledger for higher education institutions in Kazakhstan.
+
+**Target Audience:** Students, university accounting departments, and educational auditors across universities in Kazakhstan (KazNU, Satbayev University, KBTU, ENU, etc.).
 
 ---
 
-##  О проекте
+## Problem
 
-**UniChain.kz** — децентрализованная информационная система для прозрачной фиксации, учета и аудита студенческих платежей (оплата за семестры, проживание в общежитиях, академические пересдачи, библиотечные сборы и университетские взносы) в вузах Республики Казахстан (КазНУ, Satbayev University, КБТУ, ЕНУ, МУИТ, AITU и др.).
+University payments in Kazakhstan (tuition, dormitory fees, retake fees) often suffer from fragmented banking records, slow reconciliation between university accounting and student portals, lost receipts, and a lack of tamper-proof verification when students need to prove payment status.
 
-Все финансовые операции верифицируются двумя уровнями:
-1. **Ончейн-фиксация в сети Solana Devnet** с использованием официальной программы **Memo** (`MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr`).
-2. **Локальный криптографический реестр** с древовидной структурой Merkle (SHA-256) и нумерацией блоков.
+## Solution
 
----
+UniChain.kz provides a unified ledger where each payment generates an instant cryptographic receipt backed by dual verification: an internal Merkle tree block registry and an immutable on-chain record stored directly on the Solana blockchain.
 
-##  Ключевые возможности
+## How it uses Solana
 
-### 1.  Интеграция с Phantom Wallet & Solana Devnet
-- **Подключение кошелька**: прямое подключение через `window.phantom.solana`.
-- **Индикация статуса**: отображение сокращенного адреса (`XXXX...YYYY`) и реального баланса в **SOL** в сети Devnet (через `@solana/web3.js`).
-- **Автоматический Airdrop**: при нехватке SOL для оплаты сетевой комиссии приложение запрашивает 1 SOL из Devnet крана.
-- **Подсказка при отсутствии Phantom**: понятное уведомление с предложением открыть приложение в отдельной вкладке браузера с установленным расширением.
+- **Wallet Connection:** Connects directly to the user's Phantom Wallet via `window.phantom.solana` with live devnet SOL balance tracking and automated airdrop request fallback.
+- **On-Chain Recording:** Sends devnet transactions utilizing the official **Solana Memo Program** (`MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr`).
+- **Data Payload:** Encodes payment metadata using native `TextEncoder`:
+  `UniChain.kz | {Purpose} | Student: {Name} | IIN: {National ID} | University: {Abbr} | Amount: {Amount} KZT | TXID: {ID}`
+- **Verification:** Provides an instant link to [Solana Explorer](https://explorer.solana.com/?cluster=devnet) (`https://explorer.solana.com/tx/{signature}?cluster=devnet`) and maintains a persistent history of all on-chain entries.
 
-### 2.  Запись Memo-транзакций в блокчейн
-- При проведении платежа формируется транзакция в сети **Solana Devnet** с вызовом программы Memo.
-- **Кодирование данных**: используется нативный `TextEncoder` браузера (без `Buffer`).
-- **Индикация процесса**: отображение состояния *«Записываем в блокчейн…»* на кнопке и в интерфейсе.
-- **Подтверждение и эксплорер**: после подтверждения транзакции выводится бейдж *«Записано в блокчейн»* и кнопка-ссылка *«Посмотреть запись»* на [Solana Explorer](https://explorer.solana.com/?cluster=devnet).
-- **Список всех записей**: журнал ранее совершенных записей с текстом Memo, датой/временем и ссылками на обозреватель блокчейна.
-- **Обработка ошибок**: понятные сообщения на русском языке при отклонении пользователем подписи или сбоях сети.
+## How to run
 
-### 3.  Электронные криптографические квитанции
-- Детализированный чек с хешем транзакции SHA-256, номером блока, Merkle Root и подписью валидатора.
-- Прямая ссылка на ончейн-запись в Solana Explorer Devnet.
-- Возможность копирования данных и печати/сохранения в PDF.
+### Prerequisites
+- Node.js 20+ / npm
+- Phantom Wallet browser extension (switched to Solana Devnet)
 
-### 4.  Пакетная регистрация сборов (Batch Registration)
-- Инструмент для бухгалтерии вузов: загрузка реестра студентов (CSV/JSON или ручной ввод), проверка 12-значных ИИН и единовременный выпуск блока.
-
-### 5.  Поиск и аудит
-- Фильтрация транзакций по вузам, статусам, типам сборов и поиск по ИИН/ФИО студента.
-- Переключение светлой и тёмной темы.
-
----
-
-##  Стек технологий
-
-- **Фронтенд**: React 19, TypeScript, Vite
-- **Стилизация**: Tailwind CSS v4, Lucide React Icons, Motion
-- **Блокчейн**:
-  - `@solana/web3.js` (подключение к RPC Devnet, получение баланса, отправка транзакций)
-  - Phantom Wallet API (`window.phantom.solana`)
-  - Solana Memo Program (`MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr`)
-  - SHA-256 Merkle Tree хеширование
-
----
-
-##  Установка и локальный запуск
-
-### Предварительные требования
-- Node.js 20+ / Bun / npm
-- Браузер с расширением [Phantom Wallet](https://phantom.app/) (переключенным на сеть **Devnet**)
-
-### 1. Клонирование и установка зависимостей
+### Steps
 ```bash
-git clone <url-репозитория>
+# 1. Clone repository & install dependencies
+git clone <repo-url>
 cd unichain-kz
 npm install
+
+# 2. Start local development server
+npm run dev
